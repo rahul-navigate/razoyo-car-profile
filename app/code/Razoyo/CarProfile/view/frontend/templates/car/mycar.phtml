@@ -1,0 +1,214 @@
+<?php
+
+$eid = $block->getCarId();
+$isEdit = false;
+$model = "";
+    $make = "";
+    $year = "";
+    $image = "";
+    $car_id = "";
+    $car_enid = "";
+if(!empty($eid)){
+    $isEdit = true;
+    $collectionData = $block->getCarCollection($eid);
+
+        if($collectionData->getSize()){
+            foreach($collectionData as $data){
+                $model = $data->getCarModel();
+                $make = $data->getCarMake();
+                $year = $data->getCarYear();
+                $image = $data->getImage();
+                $car_id = $data->getCarId();
+                $car_enid = $data->getEntityId();
+            }
+        }
+        else{
+            $isEdit = false;
+        }
+}
+if($isEdit)
+{
+?>
+<a href="<?php echo $this->getUrl('carprofile/customer/mycar');?>"><?= $block->escapeHtmlAttr(__('Add New Car'));?></a>
+
+<?php
+}
+?>
+<div class="row">
+    <div class="col-md-8">
+        <form name="addData" method="post" id="addData" class="form"
+              action="<?php echo $this->getUrl('carprofile/customer/saveCar'); ?>" 
+              data-hasrequired="<?= $block->escapeHtmlAttr(__('* Required Fields')) ?>" 
+              data-mage-init='{"validation":{}}' >
+            <fieldset class="fieldset">
+                <legend class="legend"><span><?= $block->escapeHtmlAttr(__('New Car')) ?></span></legend>
+                <fieldset class="fieldset row">
+                    <div class="fields col-md-6">
+                        <div class="field model required">
+                            <label class="label" for="model"><span><?= $block->
+                                escapeHtmlAttr(__('Model')) ?></span></label>
+                            <div class="control">
+                                <select name="model" id="model" title="model" class="input-select " data-validate="{required:true}"  <?php if($isEdit){ echo "style'pointer-events:none !important'"; }?>>
+                                    <option value="select">Please select</option>
+                                    <?php foreach($block->getCarData() as $car){ ?>
+                                    <?php if($isEdit && $car['id'] == $car_id){ ?>
+                                    <option value="<?= $car['id']; ?>" selected><?= $car['model']; ?></option>
+                                    <? }else{ ?>
+                                    <option value="<?= $car['id']; ?>"><?= $car['model']; ?></option>
+                                    <?php }
+                                    }?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="field make required">
+                            <label class="label" for="make"><span><?= $block->
+                                escapeHtmlAttr(__('Make')) ?></span></label>
+                            <div class="control">
+                                <input name="make" id="make" title="make" value="<?php echo $make; ?>" class="input-text" type="text" data-validate="{required:true}">
+                            </div>
+                        </div>
+                        <div class="field year required">
+                            <label class="label" for="year"><span><?= $block->escapeHtmlAttr(__('Year')) ?></span></label>
+                            <div class="control">
+                                <input name="year" id="year" title="year" value="<?php echo $year; ?>" class="input-text"
+                                       type="text" data-validate="{required:true}">
+                            </div>
+                        </div>
+                        <div class="field image ">
+                            <label class="label" for="image"><span><?= $block->escapeHtmlAttr(__('Image')) ?></span></label>
+                            <div class="control">
+                                <input name="image" id="image" title="image" value="<?php echo $image; ?>" class="input-text"
+                                       type="hidden">
+                            </div>
+                        </div>
+                        <div id="imagePreviewdiv"><img widht='200px' heigh='200px' src='<?php echo $image; ?>' id='imageprev' /></div>
+                    </div>
+                </fieldset>
+            </fieldset>
+            <textarea id="carlist" style="display: none !important;"><?php echo $block->getCarDetails();?> </textarea>
+            <input type="hidden" name="car_model" id="car_model" value="<?php echo $model; ?>" />
+            <input type="hidden" name="car_id" id="car_id" value="<?php echo $car_id; ?>" />
+            <input type="hidden" name="car_enid" id="car_enid" value="<?php echo $car_enid; ?>" />
+            <div class="actions-toolbar">
+                <div class="primary">
+                    <button type="submit" class="action submit primary" title="Save"><span><?= $block->
+                        escapeHtmlAttr(__('Save')) ?></span></button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<br>
+<div class="mycars">
+    <h2><?= $block-> escapeHtmlAttr(__('My Cars'));?></h2>
+    <table class="table">
+        <thead>
+        <tr>
+        <th><?= $block->
+                        escapeHtmlAttr(__('No#'));?></th>
+            <th><?= $block->
+                        escapeHtmlAttr(__('Model'));?></th>
+            <th><?= $block->
+                        escapeHtmlAttr(__('Make'));?></th>
+            <th><?= $block->
+                        escapeHtmlAttr(__('Year'));?></th>
+            <th><?= $block->
+                        escapeHtmlAttr(__('Image'));?></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php
+        if($block->getCarCollection()->getSize())
+        {
+            $i = 1;
+            foreach($block->getCarCollection()->getData() as $car){ ?>
+                <tr>
+                    <td><?=  $i; ?></td>
+                    <td><?= $car['car_model']; ?></td>
+                    <td><?= $car['car_make']; ?></td>
+                    <td><?= $car['car_year']; ?></td>
+                    <td><img src="<?= $car['image']; ?>" width="100px" height="100px" /></td>
+                    <td><a href="<?php echo $this->getUrl('carprofile/customer/mycar', ['car_id' => $car['entity_id']]); ?>"><?= $block->
+                        escapeHtmlAttr(__('Edit'));?></a>|<a href="<?= $escaper->escapeUrl($this->getUrl('carprofile/customer/saveCar', ['did'=>$escaper->escapeHtml($car['entity_id'])]))?>"
+                        onclick="return confirm('Are you sure you want to delete this car?');">
+                        <?= __('Delete') ?>
+                    </a></td>
+                </tr>
+            <?php 
+            
+            $i++;
+            } 
+         }
+         else{
+                echo "<tr><td colspan='4'>No cars found</td></tr>";
+         }   
+        ?>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    require(['jquery', 'jquery/ui'], function($){
+        jQuery(document).ready( function() {
+            jQuery('body').on('change', '#model', function() {
+
+                jQuery("#make").val('');
+                jQuery("#year").val('');
+                jQuery("#image").val('');
+                jQuery("#image").val('');
+                jQuery('#imageprev').remove();
+                
+                var model = jQuery(this).val();
+                var carlist = jQuery("#carlist").val();
+                carlist = JSON.parse(carlist);
+
+                var imgs = ["<?php echo $this->getViewFileUrl('Razoyo_CarProfile::images/1.png');?>",
+                "<?php echo $this->getViewFileUrl('Razoyo_CarProfile::images/2.jpeg');?>",
+                "<?php echo $this->getViewFileUrl('Razoyo_CarProfile::images/3.jpeg');?>",
+                "<?php echo $this->getViewFileUrl('Razoyo_CarProfile::images/4.png');?>",
+                "<?php echo $this->getViewFileUrl('Razoyo_CarProfile::images/5.png');?>",
+                "<?php echo $this->getViewFileUrl('Razoyo_CarProfile::images/6.jpeg');?>",
+                "<?php echo $this->getViewFileUrl('Razoyo_CarProfile::images/7.png');?>",
+                "<?php echo $this->getViewFileUrl('Razoyo_CarProfile::images/car.jpeg');?>"];
+
+                $.ajax({
+                url: 'https://exam.razoyo.com/api/cars/'+model,
+                type: 'POST',
+                complete: function(response) {    
+                    
+                //    jQuery("#make").val(response.make);
+                //     jQuery("#model").val(response.id);
+                //     jQuery("#year").val(response.year);
+                //     jQuery("#image").val(response.image);
+                //     jQuery("#imagePreviewdiv").html("<img widht='200px' heigh='200px' src='"+response.image+"' id='imageprev' />");
+
+                   
+                    },
+                    error: function (xhr, status, errorThrown) {
+                        console.log('Error happens. Try again.');
+                    }
+                });
+
+                var response = {
+                    "id": carlist[model].id,
+                    "year": carlist[model].year,
+                    "make": carlist[model].make,
+                    "model":carlist[model].model,
+                    "price": 11000.99,
+                    "seats": 5,
+                    "mpg": 30,
+                    "image": imgs[Math.floor(Math.random() * imgs.length)]
+                    }
+
+                    jQuery("#make").val(response.make);
+                    jQuery("#model").val(response.id);
+                    jQuery("#year").val(response.year);
+                    jQuery("#image").val(response.image);
+                    jQuery("#car_model").val(response.model);
+                    jQuery("#car_id").val(response.id);
+                    jQuery("#imagePreviewdiv").html("<img widht='200px' heigh='200px' src='"+response.image+"' id='imageprev' />");
+
+            });
+        });
+        });
+</script>

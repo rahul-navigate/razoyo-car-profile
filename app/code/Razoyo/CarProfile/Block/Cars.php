@@ -108,7 +108,8 @@ class Cars extends \Magento\Framework\View\Element\Template
             $collection->addFieldToFilter('entity_id', $id);
             
         }
-       // $collection->addFieldToFilter('customer_id', $this->getCurrentCustomer());
+       
+       $collection->addFieldToFilter('customer_id', $this->getCurrentCustomer());
 
         return $collection;
     }
